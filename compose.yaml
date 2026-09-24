@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: board
+      POSTGRES_USER: board
+      POSTGRES_PASSWORD: board
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U board -d board"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+#  spring:
+#    build: .
+#    environment:
+#      DATABASE_URL: jdbc:postgresql://postgres:5432/board
+#      DATABASE_USERNAME: board
+#      DATABASE_PASSWORD: board
+#      TZ: Asia/Seoul
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+
+volumes:
+  pgdata:
