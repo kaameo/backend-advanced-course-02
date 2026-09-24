@@ -1,11 +1,16 @@
 package com.board.post;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.board.global.jpa.entity.BaseIdAndTime;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "POST_COMMENT")
-public class PostComment {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class PostComment extends BaseIdAndTime {
     private String comment;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Post post;
 }
