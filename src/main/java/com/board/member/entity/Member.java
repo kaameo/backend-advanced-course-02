@@ -1,7 +1,8 @@
 package com.board.member.entity;
 
 import com.board.global.jpa.entity.BaseIdAndTime;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

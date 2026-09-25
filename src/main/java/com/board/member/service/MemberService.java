@@ -1,12 +1,13 @@
 package com.board.member.service;
 
+import com.board.global.exception.NotFoundException;
+import com.board.member.dto.MemberResponseDto;
 import com.board.member.entity.Member;
 import com.board.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,8 +18,10 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
-    public Optional<Member> findById(Integer id) {
-        return memberRepository.findById(id);
+    public MemberResponseDto findById(Integer id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("회원이 없습니다. id=" + id));
+        return MemberResponseDto.from(member);
     }
 
     public Long count() {
