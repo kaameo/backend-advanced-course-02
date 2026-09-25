@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public record MemberResponseDto(
         Integer id,
-        String name,
+        String nickname,
         String email,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
@@ -14,7 +14,7 @@ public record MemberResponseDto(
     public static MemberResponseDto from(Member member) {
         return new MemberResponseDto(
                 member.getId(),
-                member.getName(),
+                member.getNickname(),
                 member.getEmail(),
                 member.getCreateDate(),
                 member.getModifyDate()
