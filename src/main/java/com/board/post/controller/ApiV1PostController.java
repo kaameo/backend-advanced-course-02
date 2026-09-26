@@ -41,13 +41,14 @@ public class ApiV1PostController {
 
     @GetMapping("")
     public ResponseEntity<Page<PostListItemDto>> findAll(
+            @RequestParam(defaultValue = "") String keyword,
             @PageableDefault(size = 10) Pageable pageable
     ) {
         Pageable pageOnly = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize()
         );
-        return ResponseEntity.ok(postService.findAll(pageOnly));
+        return ResponseEntity.ok(postService.findAll(keyword.strip(), pageOnly));
     }
 
     @PutMapping("/{id}")

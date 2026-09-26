@@ -40,8 +40,8 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PostListItemDto> findAll(Pageable pageable) {
-        return postRepository.findPostList(pageable);
+    public Page<PostListItemDto> findAll(String keyword, Pageable pageable) {
+        return postRepository.findPostList(keyword, pageable);
     }
 
 
