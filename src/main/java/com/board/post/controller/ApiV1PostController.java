@@ -7,6 +7,7 @@ import com.board.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -41,9 +42,14 @@ public class ApiV1PostController {
 
     @GetMapping("")
     public ResponseEntity<Page<PostListItemDto>> findAll(
-            @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC)
-            Pageable pageable) {
-        return ResponseEntity.ok(postService.findAll(pageable));
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        Pageable latestFirst = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "createDate")
+        );
+        return ResponseEntity.ok(postService.findAll(latestFirst));
     }
 
     @PutMapping("/{id}")
