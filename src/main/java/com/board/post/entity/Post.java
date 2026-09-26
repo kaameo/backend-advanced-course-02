@@ -26,7 +26,7 @@ public class Post extends BaseIdAndTime {
     @JoinColumn(name = "author_id")
     private Member author;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "post")
     private List<PostComment> comments = new ArrayList<>();
 
     public Post(String title, String content, Member author) {

@@ -35,7 +35,9 @@ public class PostCommentService {
     @Transactional(readOnly = true)
     public List<PostCommentResponseDto> findAllByPost(int postId) {
         getPost(postId);   // 글이 없으면 404 (빈 목록이 아니라)
-        return postCommentRepository.findByPostIdOrderByCreateDateAsc(postId).stream()
+        return postCommentRepository
+                .findAllWithAuthorByPostId(postId)
+                .stream()
                 .map(PostCommentResponseDto::from)
                 .toList();
     }

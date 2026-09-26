@@ -8,6 +8,7 @@ import com.board.post.dto.PostListItemDto;
 import com.board.post.dto.PostRequestDto;
 import com.board.post.dto.PostResponseDto;
 import com.board.post.entity.Post;
+import com.board.post.repository.PostCommentRepository;
 import com.board.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final PostCommentRepository postCommentRepository;
 
     @Transactional
     public PostResponseDto create(int memberId, PostRequestDto postRequestDto) {
@@ -39,8 +41,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Page<PostListItemDto> findAll(Pageable pageable) {
-        return postRepository.findAll(pageable)
-                .map(PostListItemDto::from);
+        return postRepository.findPostList(pageable);
     }
 
 
@@ -56,6 +57,7 @@ public class PostService {
     public void delete(int memberId, int postId) {
         Post post = getPost(postId);
         checkAuthor(post, memberId);
+        postCommentRepository.deleteAllByPostId(postId);
         postRepository.delete(post);
     }
 

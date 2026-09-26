@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,24 +43,27 @@ public class ApiV1PostController {
     public ResponseEntity<Page<PostListItemDto>> findAll(
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        Pageable latestFirst = PageRequest.of(
+        Pageable pageOnly = PageRequest.of(
                 pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by(Sort.Direction.DESC, "createDate")
+                pageable.getPageSize()
         );
-        return ResponseEntity.ok(postService.findAll(latestFirst));
+        return ResponseEntity.ok(postService.findAll(pageOnly));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PostResponseDto> update(@AuthenticationPrincipal Integer memberId,
-                                                  @PathVariable int id,
-                                                  @RequestBody @Valid PostRequestDto postRequestDto) {
+    public ResponseEntity<PostResponseDto> update(
+            @AuthenticationPrincipal Integer memberId,
+            @PathVariable int id,
+            @RequestBody @Valid PostRequestDto postRequestDto
+    ) {
         return ResponseEntity.ok(postService.update(memberId, id, postRequestDto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@AuthenticationPrincipal Integer memberId,
-                                       @PathVariable int id) {
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal Integer memberId,
+            @PathVariable int id
+    ) {
         postService.delete(memberId, id);
         return ResponseEntity.noContent().build();
     }
