@@ -22,10 +22,24 @@ public class PostComment extends BaseIdAndTime {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private PostComment parentComment;
+
     public PostComment(Post post, Member author, String content) {
         this.post = post;
         this.author = author;
         this.content = content;
+    }
+
+    public static PostComment reply(PostComment parent, Member author, String content) {
+        PostComment reply = new PostComment(parent.getPost(), author, content);
+        reply.parentComment = parent;
+        return reply;
+    }
+
+    public boolean isReply() {
+        return parentComment != null;
     }
 
     public void update(String content) {

@@ -51,8 +51,17 @@ public class DataInit {
 
             // 짝수 번째 글에만 댓글 3개 (댓글 0개인 글도 필요)
             if (i % 2 == 0) {
+                int firstCommentId = 0;
                 for (int j = 1; j <= 3; j++) {
-                    postCommentService.create(authors[j % 3], postId, new PostCommentRequestDto("댓글 " + j));
+                    int commentId = postCommentService.create(authors[j % 3], postId, new PostCommentRequestDto("댓글 " + j)).id();
+                    if (j == 1) {
+                        firstCommentId = commentId;
+                    }
+                }
+
+                // 첫 댓글에 대댓글 2개
+                for (int k = 1; k <= 2; k++) {
+                    postCommentService.createReply(authors[(k + 1) % 3], postId, firstCommentId, new PostCommentRequestDto("대댓글 " + k));
                 }
             }
         }

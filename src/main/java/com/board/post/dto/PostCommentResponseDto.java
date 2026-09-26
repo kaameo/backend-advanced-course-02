@@ -3,25 +3,34 @@ package com.board.post.dto;
 import com.board.post.entity.PostComment;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record PostCommentResponseDto(
         Integer id,
         Integer postId,
+        Integer parentId,
         String content,
         Integer authorId,
         String authorNickname,
         LocalDateTime createdAt,
-        LocalDateTime modifiedAt
+        LocalDateTime modifiedAt,
+        List<PostCommentResponseDto> replies
 ) {
-    public static PostCommentResponseDto from(PostComment postComment) {
+    public static PostCommentResponseDto from(PostComment comment) {
+        return from(comment, List.of());
+    }
+
+    public static PostCommentResponseDto from(PostComment comment, List<PostCommentResponseDto> replies) {
         return new PostCommentResponseDto(
-                postComment.getId(),
-                postComment.getPost().getId(),
-                postComment.getContent(),
-                postComment.getAuthor().getId(),
-                postComment.getAuthor().getNickname(),
-                postComment.getCreateDate(),
-                postComment.getModifyDate()
+                comment.getId(),
+                comment.getPost().getId(),
+                comment.isReply() ? comment.getParentComment().getId() : null,
+                comment.getContent(),
+                comment.getAuthor().getId(),
+                comment.getAuthor().getNickname(),
+                comment.getCreateDate(),
+                comment.getModifyDate(),
+                replies
         );
     }
 }

@@ -1,5 +1,6 @@
 package com.board.post.service;
 
+import com.board.global.exception.BadRequestException;
 import com.board.global.exception.ForbiddenException;
 import com.board.global.exception.NotFoundException;
 import com.board.member.entity.Member;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +37,19 @@ public class PostCommentService {
 
     @Transactional(readOnly = true)
     public List<PostCommentResponseDto> findAllByPost(int postId) {
-        getPost(postId);   // 글이 없으면 404 (빈 목록이 아니라)
-        return postCommentRepository
-                .findAllWithAuthorByPostId(postId)
-                .stream()
-                .map(PostCommentResponseDto::from)
+        getPost(postId);
+        List<PostComment> comments = postCommentRepository.findAllWithAuthorByPostId(postId);
+
+        Map<Integer, List<PostCommentResponseDto>> repliesByParentId = comments.stream()
+                .filter(PostComment::isReply)
+                .collect(Collectors.groupingBy(
+                        c -> c.getParentComment().getId(),
+                        Collectors.mapping(PostCommentResponseDto::from, Collectors.toList())
+                ));
+
+        return comments.stream()
+                .filter(c -> !c.isReply())
+                .map(c -> PostCommentResponseDto.from(c, repliesByParentId.getOrDefault(c.getId(), List.of())))
                 .toList();
     }
 
@@ -54,7 +65,22 @@ public class PostCommentService {
     public void delete(int memberId, int postId, int commentId) {
         PostComment comment = getComment(postId, commentId);
         checkAuthor(comment, memberId);
+        if (!comment.isReply()) {
+            postCommentRepository.deleteAllByParentId(commentId);   // 대댓글 먼저 (외래 키)
+        }
         postCommentRepository.delete(comment);
+    }
+
+    @Transactional
+    public PostCommentResponseDto createReply(int memberId, int postId, int parentId, PostCommentRequestDto request) {
+        PostComment parent = getComment(postId, parentId);   // 없거나 다른 글의 댓글이면 404
+        if (parent.isReply()) {
+            throw new BadRequestException("대댓글에는 답글을 달 수 없습니다.");
+        }
+        Member author = memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException("회원이 없습니다. id=" + memberId));
+        PostComment saved = postCommentRepository.save(PostComment.reply(parent, author, request.content()));
+        return PostCommentResponseDto.from(saved);
     }
 
     private Post getPost(int postId) {

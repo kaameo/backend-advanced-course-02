@@ -20,4 +20,9 @@ public interface PostCommentRepository extends JpaRepository<PostComment, Intege
     @Modifying
     @Query("delete from PostComment c where c.post.id = :postId")
     void deleteAllByPostId(@Param("postId") int postId);
+
+    @Modifying
+    @Query("delete from PostComment c where c.parentComment.id = :parentCommentId")
+    void deleteAllByParentId(@Param("parentCommentId") int parentId);
+
 }

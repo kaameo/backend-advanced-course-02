@@ -57,5 +57,16 @@ public class ApiV1PostCommentController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @PostMapping("/{commentId}/replies")
+    public ResponseEntity<PostCommentResponseDto> createReply(
+            @AuthenticationPrincipal Integer memberId,
+            @PathVariable int postId,
+            @PathVariable int commentId,
+            @RequestBody @Valid PostCommentRequestDto request
+    ) {
+        PostCommentResponseDto created = postCommentService.createReply(memberId, postId, commentId, request);
+        return ResponseEntity
+                .created(URI.create("/api/v1/posts/" + postId + "/comments/" + created.id()))
+                .body(created);
+    }
 }
