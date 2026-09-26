@@ -4,11 +4,14 @@ import com.board.global.exception.ForbiddenException;
 import com.board.global.exception.NotFoundException;
 import com.board.member.entity.Member;
 import com.board.member.repository.MemberRepository;
+import com.board.post.dto.PostListItemDto;
 import com.board.post.dto.PostRequestDto;
 import com.board.post.dto.PostResponseDto;
 import com.board.post.entity.Post;
 import com.board.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,12 @@ public class PostService {
     public PostResponseDto findById(int postId) {
         Post post = getPost(postId);
         return PostResponseDto.from(post);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostListItemDto> findAll(Pageable pageable) {
+        return postRepository.findAll(pageable)
+                .map(PostListItemDto::from);
     }
 
 

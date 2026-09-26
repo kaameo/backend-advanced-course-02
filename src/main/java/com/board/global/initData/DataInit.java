@@ -1,10 +1,10 @@
 package com.board.global.initData;
 
 import com.board.member.dto.MemberRequestDto;
-import com.board.member.dto.MemberResponseDto;
 import com.board.member.service.MemberService;
+import com.board.post.dto.PostCommentRequestDto;
 import com.board.post.dto.PostRequestDto;
-import com.board.post.dto.PostResponseDto;
+import com.board.post.service.PostCommentService;
 import com.board.post.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationRunner;
@@ -19,56 +19,43 @@ public class DataInit {
     private final DataInit self;
     private final MemberService memberService;
     private final PostService postService;
+    private final PostCommentService postCommentService;
 
-    public DataInit(@Lazy DataInit self, MemberService memberService, PostService postService) {
+    public DataInit(@Lazy DataInit self, MemberService memberService, PostService postService, PostCommentService postCommentService) {
         this.self = self;
         this.memberService = memberService;
         this.postService = postService;
+        this.postCommentService = postCommentService;
     }
 
     @Bean
     public ApplicationRunner baseInitDataRunner() {
         return args -> {
-            self.makeBaseMembers();
+            self.makeBaseData();
         };
     }
 
     @Transactional
-    public void makeBaseMembers() {
+    public void makeBaseData() {
         if (memberService.count() > 0) {
             return;
         }
-        int member1Id = makeMember("example1@example.com", "12345678", "홍길동1");
-        int member2Id = makeMember("example2@example.com", "12345678", "홍길동2");
-        int member3Id = makeMember("example3@example.com", "12345678", "홍길동3");
-        int member4Id = makeMember("example4@example.com", "12345678", "홍길동4");
-        int member5Id = makeMember("example5@example.com", "12345678", "홍길동5");
+        int user1 = memberService.signUp(new MemberRequestDto("example1@example.com", "12345678", "홍길동")).id();
+        int user2 = memberService.signUp(new MemberRequestDto("example2@example.com", "12345678", "김철수")).id();
+        int user3 = memberService.signUp(new MemberRequestDto("example3@example.com", "12345678", "이영희")).id();
+        int[] authors = {user1, user2, user3};
 
-        int post1Id = makePost(member1Id, "title1", "content1");
-        int post2Id = makePost(member2Id, "title2", "content2");
-        int post3Id = makePost(member2Id, "title3", "content3");
-        int post4Id = makePost(member3Id, "title4", "content4");
-        int post5Id = makePost(member3Id, "title5", "content5");
-        int post6Id = makePost(member3Id, "title6", "content5");
+        for (int i = 1; i <= 12; i++) {
+            int authorId = authors[i % 3];
+            int postId = postService.create(authorId, new PostRequestDto("테스트 글 " + i, "본문 " + i)).id();
 
-    }
-
-    private int makeMember(
-            String email,
-            String password,
-            String nickname
-    ) {
-        MemberResponseDto member = memberService.signUp(new MemberRequestDto(email, password, nickname));
-        return member.id();
-    }
-
-    private int makePost(
-            int authorId,
-            String title,
-            String content
-    ) {
-        PostResponseDto post = postService.create(authorId, new PostRequestDto(title, content));
-        return post.id();
+            // 짝수 번째 글에만 댓글 3개 (댓글 0개인 글도 필요)
+            if (i % 2 == 0) {
+                for (int j = 1; j <= 3; j++) {
+                    postCommentService.create(authors[j % 3], postId, new PostCommentRequestDto("댓글 " + j));
+                }
+            }
+        }
     }
 }
 

@@ -1,10 +1,15 @@
 package com.board.post.controller;
 
+import com.board.post.dto.PostListItemDto;
 import com.board.post.dto.PostRequestDto;
 import com.board.post.dto.PostResponseDto;
 import com.board.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +37,13 @@ public class ApiV1PostController {
                 .created(URI.create("/api/v1/posts/" + created.id()))
                 .body(created);
 
+    }
+
+    @GetMapping("")
+    public ResponseEntity<Page<PostListItemDto>> findAll(
+            @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC)
+            Pageable pageable) {
+        return ResponseEntity.ok(postService.findAll(pageable));
     }
 
     @PutMapping("/{id}")
