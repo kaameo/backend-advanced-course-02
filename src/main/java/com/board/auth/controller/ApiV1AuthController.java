@@ -27,7 +27,7 @@ public class ApiV1AuthController {
     public ResponseEntity<MemberResponseDto> signUp(@RequestBody @Valid MemberRequestDto request) {
         MemberResponseDto created = memberService.signUp(request);
         return ResponseEntity
-                .created(URI.create("/api/v1/members/" + created.id()))
+                .created(URI.create("/api/v1/members/me"))
                 .body(created);
     }
 

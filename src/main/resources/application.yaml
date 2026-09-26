@@ -6,6 +6,10 @@ spring:
   output:
     ansi:
       enabled: always
+  docker:
+    compose:
+      start:
+        arguments: postgres
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/board}
     username: ${DATABASE_USERNAME:board}

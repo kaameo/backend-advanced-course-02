@@ -15,18 +15,18 @@ services:
       timeout: 3s
       retries: 20
 
-#  spring:
-#    build: .
-#    environment:
-#      DATABASE_URL: jdbc:postgresql://postgres:5432/board
-#      DATABASE_USERNAME: board
-#      DATABASE_PASSWORD: board
-#      TZ: Asia/Seoul
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
+  spring:
+    build: .
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/board
+      DATABASE_USERNAME: board
+      DATABASE_PASSWORD: board
+      TZ: Asia/Seoul
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   pgdata:
